@@ -1,7 +1,9 @@
 package main
 
 import (
+	"context"
 	"embed"
+	"media-organizer/backend/api"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -15,6 +17,7 @@ var assets embed.FS
 func main() {
 	// Create an instance of the app structure
 	app := NewApp()
+	webApi := api.CreateApi()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -25,9 +28,16 @@ func main() {
 			Assets: assets,
 		},
 		BackgroundColour: &options.RGBA{R: 0, G: 0, B: 0, A: 0},
-		OnStartup:        app.startup,
+		DragAndDrop: &options.DragAndDrop{
+			EnableFileDrop: true,
+		},
+		OnStartup: func(ctx context.Context) {
+			app.startup(ctx)
+			webApi.Init(ctx)
+		},
 		Bind: []interface{}{
 			app,
+			webApi,
 		},
 		Linux: &linux.Options{
 			WindowIsTranslucent: true,

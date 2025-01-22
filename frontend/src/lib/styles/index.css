@@ -1,7 +1,10 @@
+@import url("$lib/icons/icons.css");
+
 html {
-    background-color: rgba(27, 38, 54, 0.85);
+    background-color: #101718;
     text-align: center;
     color: white;
+    font-size: 62.5%;
 }
 
 body {
@@ -14,5 +17,5 @@ body {
 
 #app {
     height: 100dvh;
-    text-align: center;
+    display: flex;
 }

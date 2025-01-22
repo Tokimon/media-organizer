@@ -1,0 +1,15 @@
+[class*="icon-"] {
+	display: inline-block;
+	width: 2.4rem;
+	background: currentColor;
+	aspect-ratio: 1 / 1;
+	mask-size: contain;
+	mask-repeat: no-repeat;
+	mask-position: center;
+}
+
+.icon-add { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#add'); }
+.icon-close { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#close'); }
+.icon-delete { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#delete'); }
+.icon-search { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#search'); }
+.icon-settings { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#settings'); }
