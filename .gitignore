@@ -4,6 +4,7 @@ node_modules
 .output
 .vercel
 /frontend/.svelte-kit
+/frontend/src/lib/wailsjs
 /build
 
 # OS

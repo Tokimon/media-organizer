@@ -1,29 +1,37 @@
 package tools
 
 import (
+	"errors"
 	"media-organizer/backend/datatypes"
 	"os"
 	"path/filepath"
 )
 
-func IsReadablePath(path string) (bool, error) {
-	info, err := os.Stat(path)
-
-	if err != nil {
-		return false, err
-	}
-
-	return info.Mode().Perm()&0400 != 0, nil
+type PathInfo struct {
+	ReadOnly bool
+	IsDir    bool
 }
 
-func IsDir(path string) (bool, error) {
+func GetPathInfo(path string) (*PathInfo, error) {
 	info, err := os.Stat(path)
 
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
-	return info.IsDir(), nil
+	perm := info.Mode().Perm() & 0600
+	readable := perm&0400 == 0400
+
+	if !readable {
+		return nil, errors.New("Path not readable")
+	}
+
+	editable := perm&0200 == 0200
+
+	return &PathInfo{
+		ReadOnly: !editable,
+		IsDir:    info.IsDir(),
+	}, nil
 }
 
 func FindDirFiles(dirPath string, extensions []string) []string {
@@ -45,6 +53,7 @@ func FindDirFiles(dirPath string, extensions []string) []string {
 
 func PathHasValidExtension(path string, extensions []string) bool {
 	pathExt := filepath.Ext(path)
+	pathExt = pathExt[1:]
 
 	for _, ext := range extensions {
 		if ext == pathExt {

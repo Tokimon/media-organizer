@@ -2,49 +2,73 @@ package api
 
 import (
 	"context"
-	"fmt"
-	"media-organizer/backend/stores"
 	"media-organizer/backend/tools"
+	"path/filepath"
+	"regexp"
 	"slices"
 	"strings"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
-type ApiReturnValue struct {
-	Files  []string
-	Errors map[string]string
-}
-
-type Temp struct {
-	Value string
+type ApiFile struct {
+	Path      string `json:"path"`
+	Name      string `json:"name"`
+	Extension string `json:"extension"`
+	Error     error  `json:"error"`
+	ReadOnly  bool   `json:"readOnly"`
 }
 
 type Api struct {
-	ctx   context.Context
-	files stores.FileStore
+	ctx        context.Context
+	Extensions []string
 }
 
 func CreateApi() *Api {
-	extensions := slices.Concat(tools.DefaultExtensions.Images(), tools.DefaultExtensions.Video)
-
 	return &Api{
-		files: *stores.CreateFileStore(extensions),
+		Extensions: slices.Concat(tools.DefaultExtensions.Images(), tools.DefaultExtensions.Video),
 	}
+}
+
+func pathToApiFile(path string) ApiFile {
+	inf, err := tools.GetPathInfo(path)
+
+	ext := filepath.Ext(path)
+	baseName := strings.TrimSuffix(filepath.Base(path), ext)
+	exp := regexp.MustCompile(`(?:_\d{1,3}|\s+\((?:\d{1,3}|.*?copy)\))\s*$`)
+	name := exp.ReplaceAllString(baseName, "")
+
+	return ApiFile{
+		Path:      path,
+		Name:      name,
+		Extension: ext,
+		ReadOnly:  err != nil || inf.ReadOnly,
+		Error:     err,
+	}
+}
+
+func pathsToApiFiles(paths []string) []ApiFile {
+	files := make([]ApiFile, len(paths))
+
+	for i, path := range paths {
+		files[i] = pathToApiFile(path)
+	}
+
+	return files
 }
 
 func (api *Api) Init(ctx context.Context) {
 	api.ctx = ctx
 }
 
-func (api *Api) AddFiles() (*ApiReturnValue, error) {
-	exts := "*." + strings.Join(api.files.Extensions, ";*.")
+func (api *Api) SelectFiles() ([]ApiFile, error) {
+	exts := "*." + strings.Join(api.Extensions, ";*.")
 
 	paths, err := runtime.OpenMultipleFilesDialog(api.ctx, runtime.OpenDialogOptions{
 		Title: "Select files to add",
 		Filters: []runtime.FileFilter{
 			{
-				DisplayName: "Images or Videos",
+				DisplayName: "Select Files to Add",
 				Pattern:     exts,
 			},
 		},
@@ -54,48 +78,37 @@ func (api *Api) AddFiles() (*ApiReturnValue, error) {
 		return nil, err
 	}
 
-	api.files.AddFiles(paths)
-
-	fmt.Println(api.GetData())
-
-	return api.GetData(), nil
+	return pathsToApiFiles(paths), nil
 }
 
-func (api *Api) AddDirectory() (*ApiReturnValue, error) {
+func (api *Api) SelectDirectory() ([]ApiFile, error) {
 	path, err := runtime.OpenDirectoryDialog(api.ctx, runtime.OpenDialogOptions{
-		Title: "Select folder to add",
+		Title: "Select Folder to add",
 	})
 
 	if err != nil {
 		return nil, err
 	}
 
-	api.files.AddDirectory(path)
+	paths := tools.FindDirFiles(path, api.Extensions)
 
-	return api.GetData(), nil
+	return pathsToApiFiles(paths), nil
 }
 
-func (api *Api) GetData() *ApiReturnValue {
-	return &ApiReturnValue{
-		Files:  api.files.Paths(),
-		Errors: api.files.Errors(),
-	}
-}
+func (api *Api) SelectFromDrop(x int, y int, paths []string) ([]ApiFile, error) {
+	allFiles := make([]ApiFile, 0)
 
-func (api *Api) OnFileDrop(x int, y int, paths []string) {
 	for _, path := range paths {
-		isDir, err := tools.IsDir(path)
+		info, err := tools.GetPathInfo(path)
 
-		if err != nil {
-			fmt.Println("Failed to stat:", path)
-		} else if !isDir {
-			// Path is a file
-			fmt.Println(path)
+		if err == nil && info.IsDir {
+			filePaths := tools.FindDirFiles(path, api.Extensions)
+			allFiles = append(allFiles, pathsToApiFiles(filePaths)...)
 		} else {
-			// Path is a dir
-			for _, filePath := range tools.FindDirFiles(path, api.files.Extensions) {
-				fmt.Println(filePath)
-			}
+			// If file errored or path is not a directory
+			allFiles = append(allFiles, pathToApiFile(path))
 		}
 	}
+
+	return allFiles, nil
 }
