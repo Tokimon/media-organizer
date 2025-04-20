@@ -1,12 +1,11 @@
 <script lang='ts' module>
-console.log('MODULE INNIT')
-console.time('files')
-const files = Array.from(Array(25000), (_, i) => i + ".png");
-console.timeEnd('files')
+const files = Array.from(Array(2500000), (_, i) => i + ".png");
+const filesLen = files.length
 </script>
 
 <script lang="ts">
     import Thumbnail from "$lib/components/Thumbnail.svelte";
+    import debounce from '$lib/tools/debounce.js'
 
     type Props = {
         items?: string[];
@@ -25,7 +24,6 @@ console.timeEnd('files')
     // biome-ignore lint/style/useConst: this will be set with the bind further down
     let listWidth = $state(0);
 
-    // biome-ignore lint/style/useConst: this will be set with the onscroll event further down
     let scrollY = $state(0)
 
     const fullItemWidth = $derived(itemWidth + SPACING)
@@ -35,7 +33,7 @@ console.timeEnd('files')
       const cols = itemWidth ? Math.floor((listWidth - (SPACING * 2)) / fullItemWidth) : 1;
       const rows = itemHeight ? Math.ceil((listHeight - (SPACING * 2)) / fullItemHeight) : 1;
       const width = (fullItemWidth * cols) - SPACING;
-      const height = fullItemHeight * Math.ceil(files.length / cols)
+      const height = fullItemHeight * Math.ceil(filesLen / cols)
       const extra = Math.min(Math.ceil(rows / 2), 3)
 
       return { cols, rows, extra, width, height }
@@ -43,13 +41,33 @@ console.timeEnd('files')
 
     const bounds = $derived.by(() => {
       const rowsInSpace = Math.floor((scrollY + SPACING) / fullItemHeight)
-      const startRow = Math.max(rowsInSpace - view.extra, 0)
-      const viewFullRowCount = view.rows + (view.extra * 2)
-      const start = startRow * view.cols;
-      const end = Math.min(start + (viewFullRowCount * view.cols), files.length);
+      const renderedRows = view.rows + (view.extra * 2)
 
-      return { start, end, startRow }
+      const startRow = Math.max(rowsInSpace - view.extra, 0)
+      const start = startRow * view.cols;
+      const end = Math.min(start + (renderedRows * view.cols), filesLen);
+      const count = end - start;
+
+      return { start, end, startRow, count }
     });
+
+    function initList(fileList: HTMLElement) {
+      const scrollEnd = debounce(() => { console.log('SCROLL END') });
+
+      function updateScroll() {
+        scrollY = fileList.scrollTop
+        scrollEnd()
+      };
+
+      $effect(() => {
+        fileList.addEventListener('scroll', updateScroll)
+        updateScroll()
+
+        return () => {
+          fileList.removeEventListener('scroll', updateScroll)
+        }
+      })
+    }
 </script>
 
 <!--
@@ -65,22 +83,15 @@ console.timeEnd('files')
         - Same goes for keyboard selection (so replace click with moving 'cursor' around)
 -->
 
-
-<!-- <div class="size" style="width: {view.width}px; height: {itemHeight}px;">
-    <p>List: {listWidth} / {listHeight} / {SPACING}</p>
-    <p>Item: {itemWidth} / {itemHeight} / {fullItemHeight}</p>
-    <p>Info: {view.cols} / {view.rows}/ {view.width} / {view.height}</p>
-    <p>Bounds: {bounds.start} / {bounds.end}</p>
-</div> -->
-
 <div
     class="file-list-container"
     bind:offsetWidth={listWidth}
     bind:offsetHeight={listHeight}
-    onscroll={(e) => { scrollY = (e.target as HTMLElement).scrollTop; console.log('setting scroll!') }}
-    onscrollend={() => {console.log('END!'); requestAnimationFrame(() => console.log('REAL END!'))}}
+    use:initList
     style="--content-height: {view.height}px; width: {narrow ? '150rem' : 'auto'};"
 >
+    <!--
+     -->
     {#snippet fileContent(file: typeof files[number])}
         <Thumbnail src={file} />
         <!-- {#if group.count > 1}<span class="file-group-count">{group.count}</span>{/if} -->
@@ -92,9 +103,10 @@ console.timeEnd('files')
     {/snippet}
 
     {#if files.length}
-        <!-- {@const start = (space.rowsBefore * view.cols) || 0} -->
         <div class="file-list" style="--size: {itemWidth}px; --spacing: {SPACING}px; --position-offset: {bounds.startRow * fullItemHeight}px;">
-            {#each files.slice(bounds.start, bounds.end) as file, i (file)}
+            {#each { length: bounds.count }, i (i)}
+                {@const file = files[i + bounds.start]}
+
                 {#if i === 0}
                     <figure class="file" bind:offsetHeight={itemHeight} title={file}>
                         {@render fileContent(file)}
@@ -173,26 +185,4 @@ console.timeEnd('files')
         color: white;
         box-shadow: inset 0 0 0.3rem rgb(0 0 0 / 50%);
     }
-
-    /* .size {
-        position: absolute;
-        padding: 10px;
-        background: rgb(200 100 0 / 70%);
-        inset: 10px 0 auto 0;
-        margin: 0 auto;
-        color: black;
-        z-index: 9;
-        box-sizing: border-box;
-        gap: 30px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        text-shadow: 0 0 8px white;
-        font-weight: bolder;
-        pointer-events: none;
-
-        p {
-            margin: 0;
-        }
-    } */
 </style>
