@@ -1,6 +1,6 @@
 <script lang="ts">
-    import stringEndSplit from "~/tools/stringEndSplit";
-    import type { Stylable } from "~/types.d";
+    import stringEndSplit from "$lib/tools/stringEndSplit";
+    import type { Stylable } from "$lib/types.d";
 
     type Props = Stylable & {
         path: string;

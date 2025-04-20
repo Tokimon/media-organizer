@@ -1,25 +1,29 @@
-import type { api } from "$lib/wailsjs/go/models";
+import { GetExtensions, GetFiles } from "$lib/wailsjs/go/api/Api";
+import type { api, tools } from "$lib/wailsjs/go/models";
 import { SvelteMap } from "svelte/reactivity";
 
-const files = new SvelteMap<string, api.ApiFile>();
+class FileStore {
+  files = new SvelteMap<string, api.ApiFile>();
+  extensions = $state<Partial<tools.Extensions>>({});
 
-export default {
-  files,
+  async update(updatedFileList: Record<string, api.ApiFile>) {
+    const currPaths = new Set(this.files.keys());
 
-  addFiles(filesToAdd: api.ApiFile | api.ApiFile[]) {
-    const fileArray = Array.isArray(filesToAdd) ? filesToAdd : [filesToAdd];
+    // Update entries in the list
+    for (const file of Object.values(updatedFileList)) {
+      this.files.set(file.path, file);
+      currPaths.delete(file.path);
+    }
 
-    for (const file of fileArray) files.set(file.path, file);
-  },
+    // Remove any paths that were not in the updated file list
+    for (const path of currPaths) this.files.delete(path);
+  }
 
-  removeFiles(paths: string | string[]) {
-    const pathArray = Array.isArray(paths) ? paths : [paths];
+  async init() {
+    const [ext, files] = await Promise.all([GetExtensions(), GetFiles()]);
+    this.update(files);
+    this.extensions = ext;
+  }
+}
 
-    for (const path of pathArray) files.delete(path);
-  },
-
-  removeDirectory(dirPath: string) {
-    for (const file of files.values())
-      if (file.path.startsWith(dirPath)) files.delete(file.path);
-  },
-};
+export default new FileStore();

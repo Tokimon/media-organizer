@@ -1,9 +1,11 @@
- <script lang="ts">
-  import { OnFileDrop } from '$lib/wailsjs/runtime/runtime';
+<script lang="ts">
+  import AppHeader from '$lib/components/AppHeader.svelte';
+  import fileStore from '$lib/stores/file-store.svelte.js';
   import { SelectFromDrop } from '$lib/wailsjs/go/api/Api';
-  import fileStore from '$lib/stores/file-store.svelte.js'
+  import { OnFileDrop } from '$lib/wailsjs/runtime/runtime';
+  import { onMount } from 'svelte';
 
-  import '$lib/styles/index.css'
+  import '$lib/styles/index.css';
 
   const { children } = $props();
   let showDropArea = $state(false)
@@ -21,7 +23,7 @@
   OnFileDrop(async (...args) => {
     try {
       const files = await SelectFromDrop(...args)
-      fileStore.addFiles(files)
+      fileStore.update(files)
     } catch(err) {
       // TODO: Better error handling
       console.error(err)
@@ -29,18 +31,30 @@
 
     showDropArea = false
   }, true)
+
+  onMount(() => fileStore.init())
 </script>
+
+<AppHeader />
 
 {#if showDropArea}
     <div class="drop-target"></div>
 {/if}
 
-{@render children()}
+<main>{@render children()}</main>
 
 <style>
     :root {
       --wails-drop-target: none;
       font-size: 62.5%;
+      position: relative;
+    }
+
+    :global(body) {
+        font-size: 1.4rem;
+        display: flex;
+        flex-direction: column;
+        height: 100dvh;
     }
 
     .drop-target {
@@ -50,5 +64,12 @@
         inset: 2em;
         background: rgb(255 255 255 / 50%);
         border-radius: 2em;
+    }
+
+    main {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        overflow: clip;
     }
 </style>

@@ -8,8 +8,26 @@
 	mask-position: center;
 }
 
-.icon-add { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#add'); }
-.icon-close { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#close'); }
-.icon-delete { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#delete'); }
-.icon-search { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#search'); }
-.icon-settings { mask-image: url('./icons-uljz1YM9vSeI7gGqBZepb0yQZZY=.svg#settings'); }
+.icon-add { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#add'); }
+.icon-add_folder { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#add_folder'); }
+.icon-add_image { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#add_image'); }
+.icon-book { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#book'); }
+.icon-camera_roll { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#camera_roll'); }
+.icon-close { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#close'); }
+.icon-code { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#code'); }
+.icon-data { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#data'); }
+.icon-delete { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#delete'); }
+.icon-hd { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#hd'); }
+.icon-image_square { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#image_square'); }
+.icon-play_circle { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#play_circle'); }
+.icon-save { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#save'); }
+.icon-search { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#search'); }
+.icon-settings { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#settings'); }
+.icon-settings_2 { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#settings_2'); }
+.icon-settings_square { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#settings_square'); }
+.icon-storage { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#storage'); }
+.icon-unknown { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#unknown'); }
+.icon-unknown_square { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#unknown_square'); }
+.icon-vector { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#vector'); }
+.icon-vector_2 { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#vector_2'); }
+.icon-volume_up { mask-image: url('./icons-en8Z0p7Suim989FuxV3itdDRgwY=.svg#volume_up'); }

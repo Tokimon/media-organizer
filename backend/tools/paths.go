@@ -5,6 +5,7 @@ import (
 	"media-organizer/backend/datatypes"
 	"os"
 	"path/filepath"
+	"slices"
 )
 
 type PathInfo struct {
@@ -34,7 +35,7 @@ func GetPathInfo(path string) (*PathInfo, error) {
 	}, nil
 }
 
-func FindDirFiles(dirPath string, extensions []string) []string {
+func FindDirFilePaths(dir_path string, extensions []string) []string {
 	set := datatypes.NewStringSet()
 
 	for _, ext := range extensions {
@@ -46,20 +47,12 @@ func FindDirFiles(dirPath string, extensions []string) []string {
 		extSet: *set,
 	}
 
-	walker.walk(dirPath)
+	walker.walk(dir_path)
 
 	return walker.files
 }
 
 func PathHasValidExtension(path string, extensions []string) bool {
 	pathExt := filepath.Ext(path)
-	pathExt = pathExt[1:]
-
-	for _, ext := range extensions {
-		if ext == pathExt {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(extensions, pathExt[1:])
 }
