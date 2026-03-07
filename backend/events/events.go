@@ -1,4 +1,4 @@
-//go:generate go run ../cmd/generate_events.go
+//go:generate go run ../cmd/generate_events_gen_ts.go
 
 package events
 

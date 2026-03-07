@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	f, err := os.Create("frontend/src/lib/events.ts")
+	f, err := os.Create("../../frontend/src/lib/events-gen.ts")
 
 	if err != nil {
 		log.Fatalf("could not create file: %v", err)
