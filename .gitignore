@@ -3,9 +3,10 @@ node_modules
 # Output
 .output
 .vercel
-/frontend/.svelte-kit
-/frontend/src/lib/wailsjs
-/build
+frontend/.svelte-kit
+frontend/src/lib/wailsjs
+build
+frontend/dist
 
 # OS
 .DS_Store
