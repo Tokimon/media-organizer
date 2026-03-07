@@ -2,10 +2,8 @@ package tools
 
 import (
 	"errors"
-	"media-organizer/backend/datatypes"
+	"fmt"
 	"os"
-	"path/filepath"
-	"slices"
 )
 
 type PathInfo struct {
@@ -13,18 +11,25 @@ type PathInfo struct {
 	IsDir    bool
 }
 
+var ErrPathNotFound = errors.New("path does not exist")
+var ErrPathNotReadable = errors.New("path is not readable")
+
 func GetPathInfo(path string) (*PathInfo, error) {
 	info, err := os.Stat(path)
 
 	if err != nil {
-		return nil, err
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%q: %w", path, ErrPathNotFound)
+		}
+
+		return nil, fmt.Errorf("Failed to stat %q: %w", path, err)
 	}
 
 	perm := info.Mode().Perm() & 0600
 	readable := perm&0400 == 0400
 
 	if !readable {
-		return nil, errors.New("Path not readable")
+		return nil, fmt.Errorf("%q: %w", path, ErrPathNotReadable)
 	}
 
 	editable := perm&0200 == 0200
@@ -35,24 +40,12 @@ func GetPathInfo(path string) (*PathInfo, error) {
 	}, nil
 }
 
-func FindDirFilePaths(dir_path string, extensions []string) []string {
-	set := datatypes.NewStringSet()
-
-	for _, ext := range extensions {
-		set.Add("." + ext)
-	}
-
-	walker := DirWalker{
-		files:  []string{},
-		extSet: *set,
-	}
-
-	walker.walk(dir_path)
-
-	return walker.files
+func FindDirFilePaths(dirPath string, extensions []string) ([]string, []PathError) {
+	dirWalker := CreateDirWalker(extensions)
+	return dirWalker(dirPath)
 }
 
-func PathHasValidExtension(path string, extensions []string) bool {
-	pathExt := filepath.Ext(path)
-	return slices.Contains(extensions, pathExt[1:])
-}
+// func PathHasValidExtension(path string, extensions []string) bool {
+// 	pathExt := filepath.Ext(path)
+// 	return slices.Contains(extensions, pathExt[1:])
+// }
