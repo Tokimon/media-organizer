@@ -1,5 +1,5 @@
 <script lang='ts'>
-  const props = $props()
+	const props = $props();
 </script>
 
 <button class="button" type="button" {...props}>

@@ -1,6 +1,7 @@
 <script lang="ts">
-    import type { PropsWithChildren } from "~/types.d";
-    const props: PropsWithChildren = $props();
+	import type { PropsWithChildren } from '~/types.d';
+
+	const props: PropsWithChildren = $props();
 </script>
 
 <div class="focus-dot {props.class}" style={props.style}>

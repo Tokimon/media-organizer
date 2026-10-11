@@ -1,45 +1,24 @@
 <script lang="ts">
-  import AppHeader from '$lib/components/AppHeader.svelte';
-  import fileStore from '$lib/stores/file-store.svelte.js';
-  import { SelectFromDrop } from '$lib/wailsjs/go/api/Api';
-  import { OnFileDrop } from '$lib/wailsjs/runtime/runtime';
-  import { onMount } from 'svelte';
+	import AppHeader from '$lib/components/AppHeader.svelte';
+	import LoadingDialog from '$lib/components/dialogs/LoadingDialog.svelte';
+	import DnD from '$lib/scripts/DnD.svelte.js';
+	import FileStore from '$lib/stores/file-store.svelte.js';
 
-  import '$lib/styles/index.css';
+	import '$lib/styles/index.css';
 
-  const { children } = $props();
-  let showDropArea = $state(false)
+	const { children } = $props();
 
-  window.addEventListener("dragover", (e) => e.preventDefault())
-
-  window.addEventListener("drop", (e) => e.preventDefault(), false)
-  document.body.addEventListener("dragleave", (e) => e.preventDefault(), false)
-
-  window.addEventListener("dragenter", (e) => {
-    e.preventDefault()
-    showDropArea = true
-  }, false)
-
-  OnFileDrop(async (...args) => {
-    try {
-      const files = await SelectFromDrop(...args)
-      fileStore.update(files)
-    } catch(err) {
-      // TODO: Better error handling
-      console.error(err)
-    }
-
-    showDropArea = false
-  }, true)
-
-  onMount(() => fileStore.init())
+	DnD.init();
+	FileStore.init();
 </script>
 
 <AppHeader />
 
-{#if showDropArea}
+{#if DnD.dragOver}
     <div class="drop-target"></div>
 {/if}
+
+<LoadingDialog open={FileStore.loading} />
 
 <main>{@render children()}</main>
 

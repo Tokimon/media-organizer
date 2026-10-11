@@ -1,29 +1,46 @@
-import { GetExtensions, GetFiles } from "$lib/wailsjs/go/api/Api";
-import type { api, tools } from "$lib/wailsjs/go/models";
-import { SvelteMap } from "svelte/reactivity";
+import { onMount } from 'svelte';
+import { SvelteMap } from 'svelte/reactivity';
+import { EventNames } from '$lib/events.js';
+import { GetExtensions, RequestAllFiles } from '$lib/wailsjs/go/api/Api.js';
+import type { stores } from '$lib/wailsjs/go/models.js';
+import { EventsOn } from '$lib/wailsjs/runtime/runtime.js';
 
 class FileStore {
-  files = new SvelteMap<string, api.ApiFile>();
-  extensions = $state<Partial<tools.Extensions>>({});
+	files = new SvelteMap<string, stores.FileEntry>();
+	extensions = $state<string[]>([]);
+	loading = $state(false);
 
-  async update(updatedFileList: Record<string, api.ApiFile>) {
-    const currPaths = new Set(this.files.keys());
+	resetFiles(files: stores.FileEntry[]) {
+		this.files.clear();
+		this.addFiles(files);
+	}
 
-    // Update entries in the list
-    for (const file of Object.values(updatedFileList)) {
-      this.files.set(file.path, file);
-      currPaths.delete(file.path);
-    }
+	addFiles(files: stores.FileEntry[]) {
+		for (const file of files) this.files.set(file.path, file);
+	}
 
-    // Remove any paths that were not in the updated file list
-    for (const path of currPaths) this.files.delete(path);
-  }
+	init() {
+		onMount(() => {
+			GetExtensions().then((ext) => {
+				this.extensions = ext;
+			});
 
-  async init() {
-    const [ext, files] = await Promise.all([GetExtensions(), GetFiles()]);
-    this.update(files);
-    this.extensions = ext;
-  }
+			const removeFileLoadBegin = EventsOn(EventNames.fileLoadingBegin, () => {
+				this.loading = true;
+			});
+
+			const removeFileLoadEnd = EventsOn(EventNames.fileLoadingEnd, (files) =>
+				this.resetFiles(files),
+			);
+
+			RequestAllFiles().then((files) => this.resetFiles(files));
+
+			return () => {
+				removeFileLoadBegin();
+				removeFileLoadEnd();
+			};
+		});
+	}
 }
 
 export default new FileStore();

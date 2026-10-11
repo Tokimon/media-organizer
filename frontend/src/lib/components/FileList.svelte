@@ -1,77 +1,79 @@
-<script lang='ts' module>
-const files = Array.from(Array(2500000), (_, i) => i + ".png");
-const filesLen = files.length
-</script>
-
 <script lang="ts">
-    import Thumbnail from "$lib/components/Thumbnail.svelte";
-    import debounce from '$lib/tools/debounce.js'
+	import Thumbnail from '$lib/components/Thumbnail.svelte';
+	import debounce from '$lib/tools/debounce.js';
 
-    type Props = {
-        items?: string[];
-        itemWidth?: number;
-        narrow?: boolean;
-    };
+	type Props = {
+		files: string[];
+		itemWidth?: number;
+		narrow?: boolean;
+	};
 
-    const { items, itemWidth = 100, narrow = false }: Props = $props();
+	const { files, itemWidth = 100, narrow = false }: Props = $props();
 
-    const SPACING = 10;
+	const SPACING = 10;
 
-    // biome-ignore lint/style/useConst: this will be set with the bind further down
-    let itemHeight = $state(0);
-    // biome-ignore lint/style/useConst: this will be set with the bind further down
-    let listHeight = $state(0);
-    // biome-ignore lint/style/useConst: this will be set with the bind further down
-    let listWidth = $state(0);
+	// biome-ignore lint/style/useConst: this will be set with the bind further down
+	let itemHeight = $state(0);
+	// biome-ignore lint/style/useConst: this will be set with the bind further down
+	let listHeight = $state(0);
+	// biome-ignore lint/style/useConst: this will be set with the bind further down
+	let listWidth = $state(0);
 
-    let scrollY = $state(0)
+	let scrollY = $state(0);
 
-    const fullItemWidth = $derived(itemWidth + SPACING)
-    const fullItemHeight = $derived(itemHeight + SPACING)
+	const fullItemWidth = $derived(itemWidth + SPACING);
+	const fullItemHeight = $derived(itemHeight + SPACING);
 
-    const view = $derived.by(() => {
-      const cols = itemWidth ? Math.floor((listWidth - (SPACING * 2)) / fullItemWidth) : 1;
-      const rows = itemHeight ? Math.ceil((listHeight - (SPACING * 2)) / fullItemHeight) : 1;
-      const width = (fullItemWidth * cols) - SPACING;
-      const height = fullItemHeight * Math.ceil(filesLen / cols)
-      const extra = Math.min(Math.ceil(rows / 2), 3)
+	const view = $derived.by(() => {
+		const cols = itemWidth
+			? Math.floor((listWidth - SPACING * 2) / fullItemWidth)
+			: 1;
+		const rows = itemHeight
+			? Math.ceil((listHeight - SPACING * 2) / fullItemHeight)
+			: 1;
+		const width = fullItemWidth * cols - SPACING;
+		const height = fullItemHeight * Math.ceil(files.length / cols);
+		const extra = Math.min(Math.ceil(rows / 2), 3);
 
-      return { cols, rows, extra, width, height }
-    })
+		return { cols, rows, extra, width, height };
+	});
 
-    const bounds = $derived.by(() => {
-      const rowsInSpace = Math.floor((scrollY + SPACING) / fullItemHeight)
-      const renderedRows = view.rows + (view.extra * 2)
+	const bounds = $derived.by(() => {
+		const rowsInSpace = Math.floor((scrollY + SPACING) / fullItemHeight);
+		const renderedRows = view.rows + view.extra * 2;
 
-      const startRow = Math.max(rowsInSpace - view.extra, 0)
-      const start = startRow * view.cols;
-      const end = Math.min(start + (renderedRows * view.cols), filesLen);
-      const count = end - start;
+		const startRow = Math.max(rowsInSpace - view.extra, 0);
+		const start = startRow * view.cols;
+		const end = Math.min(start + renderedRows * view.cols, files.length);
+		const count = end - start;
 
-      return { start, end, startRow, count }
-    });
+		return { start, end, startRow, count };
+	});
 
-    function initList(fileList: HTMLElement) {
-      const scrollEnd = debounce(() => { console.log('SCROLL END') });
+	function initList(fileList: HTMLElement) {
+		const scrollEnd = debounce(() => {
+			console.log('SCROLL END');
+		});
 
-      function updateScroll() {
-        scrollY = fileList.scrollTop
-        scrollEnd()
-      };
+		function updateScroll() {
+			scrollY = fileList.scrollTop;
+			scrollEnd();
+		}
 
-      $effect(() => {
-        fileList.addEventListener('scroll', updateScroll)
-        updateScroll()
+		$effect(() => {
+			fileList.addEventListener('scroll', updateScroll);
+			updateScroll();
 
-        return () => {
-          fileList.removeEventListener('scroll', updateScroll)
-        }
-      })
-    }
+			return () => {
+				fileList.removeEventListener('scroll', updateScroll);
+			};
+		});
+	}
 </script>
 
 <!--
     TODO:
+    - Add POC for the huge list problem in sveltekit (100K+ files)
     - Image Loading
     - Selection options (toggle selection mode ?):
         - click: No selection change
@@ -90,8 +92,6 @@ const filesLen = files.length
     use:initList
     style="--content-height: {view.height}px; width: {narrow ? '150rem' : 'auto'};"
 >
-    <!--
-     -->
     {#snippet fileContent(file: typeof files[number])}
         <Thumbnail src={file} />
         <!-- {#if group.count > 1}<span class="file-group-count">{group.count}</span>{/if} -->

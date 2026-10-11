@@ -1,25 +1,25 @@
 <script lang="ts">
-    import fileStore from "$lib/stores/file-store.svelte.js";
-    import isWebImageExtension from "$lib/tools/isWebImageExtension.js";
-    import ImagePlaceholder from "./ImagePlaceholder.svelte";
+	import fileStore from '$lib/stores/file-store.svelte.js';
+	import isWebImageExtension from '$lib/tools/isWebImageExtension.js';
+	import ImagePlaceholder from './ImagePlaceholder.svelte';
 
-    type Props = Partial<
-        Pick<HTMLImageElement, "className" | "src" | "alt"> & { style: string }
-    >;
-    const props: Props = $props();
+	type Props = Partial<
+		Pick<HTMLImageElement, 'className' | 'src' | 'alt'> & { style: string }
+	>;
+	const props: Props = $props();
 
-    let failed = $state(false);
+	let failed = $state(false);
 
-    function imageError() {
-        failed = true;
-    }
+	function imageError() {
+		failed = true;
+	}
 
-    const ext = $derived.by(() => {
-        if (!props.src) return "";
+	const ext = $derived.by(() => {
+		if (!props.src) return '';
 
-        const fileInfo = fileStore.files.get(props.src);
-        return fileInfo?.extension ?? props.src.split(".").at(-1) ?? "";
-    });
+		const fileInfo = fileStore.files.get(props.src);
+		return fileInfo?.extension ?? props.src.split('.').at(-1) ?? '';
+	});
 </script>
 
 {#if false && !failed && isWebImageExtension(ext)}

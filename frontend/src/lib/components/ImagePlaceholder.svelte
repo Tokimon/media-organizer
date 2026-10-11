@@ -1,15 +1,15 @@
 <script lang="ts">
-    import Icon from "$lib/components/Icon.svelte";
-    import fileStore from "$lib/stores/file-store.svelte.js";
-    import extensionToIcon from "$lib/tools/extensionToIcon.js";
+	import Icon from '$lib/components/Icon.svelte';
+	import fileStore from '$lib/stores/file-store.svelte.js';
+	import extensionToIcon from '$lib/tools/extensionToIcon.js';
 
-    type Props = {
-        ext: string;
-        className?: string;
-        style?: string;
-    };
+	type Props = {
+		ext: string;
+		className?: string;
+		style?: string;
+	};
 
-    const { ext, className, style }: Props = $props();
+	const { ext, className, style }: Props = $props();
 </script>
 
 <div class={["image-placeholder", className]} {style}>

@@ -1,22 +1,22 @@
 <script lang="ts">
-    import stringEndSplit from "$lib/tools/stringEndSplit";
-    import type { Stylable } from "$lib/types.d";
+	import stringEndSplit from '$lib/tools/stringEndSplit';
+	import type { Stylable } from '$lib/types.d';
 
-    type Props = Stylable & {
-        path: string;
-        separator?: string;
-        placeholder?: string;
-    };
+	type Props = Stylable & {
+		path: string;
+		separator?: string;
+		placeholder?: string;
+	};
 
-    const {
-        path,
-        separator = "/",
-        placeholder = "No path ...",
-        style,
-        ...props
-    }: Props = $props();
+	const {
+		path,
+		separator = '/',
+		placeholder = 'No path ...',
+		style,
+		...props
+	}: Props = $props();
 
-    const [beginStr, endStr] = $derived(stringEndSplit(path, separator));
+	const [beginStr, endStr] = $derived(stringEndSplit(path, separator));
 </script>
 
 <span

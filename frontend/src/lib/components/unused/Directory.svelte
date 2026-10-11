@@ -1,19 +1,19 @@
 <script lang="ts">
-    import type { MouseEventHandler } from "svelte/elements";
-    import type { Stylable } from "~/types";
-    import FocusDot from "~/components/focus-dot/FocusDot.svelte";
-    import Path from "~/components/path/Path.svelte";
-    import SvgIcon from "~/components/svg-icon/SVGIcon.svelte";
+	import type { MouseEventHandler } from 'svelte/elements';
+	import FocusDot from '~/components/focus-dot/FocusDot.svelte';
+	import Path from '~/components/path/Path.svelte';
+	import SvgIcon from '~/components/svg-icon/SVGIcon.svelte';
+	import type { Stylable } from '~/types';
 
-    type Props = Stylable & {
-        onclick?: MouseEventHandler<HTMLButtonElement>;
-        path: string;
-        count?: number;
-    };
+	type Props = Stylable & {
+		onclick?: MouseEventHandler<HTMLButtonElement>;
+		path: string;
+		count?: number;
+	};
 
-    const { path = "", count = 0, onclick, style, ...props }: Props = $props();
+	const { path = '', count = 0, onclick, style, ...props }: Props = $props();
 
-    const unixPath = $derived(path.replaceAll("\\", "/").replace(/\/+$/, ""));
+	const unixPath = $derived(path.replaceAll('\\', '/').replace(/\/+$/, ''));
 </script>
 
 <button type="button" class="display {props.class}" {onclick} {style}>

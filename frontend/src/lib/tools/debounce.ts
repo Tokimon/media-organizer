@@ -1,16 +1,16 @@
 export default function debounce<T extends (...args: unknown[]) => void>(
-  callback: T,
-  ms = 200,
+	callback: T,
+	ms = 200,
 ) {
-  let id: ReturnType<typeof setTimeout>;
-  const cancelDebounce = () => clearTimeout(id);
+	let id: ReturnType<typeof setTimeout>;
+	const cancelDebounce = () => clearTimeout(id);
 
-  function fn(...args: Parameters<T>) {
-    cancelDebounce();
-    id = setTimeout(() => callback(...args), ms);
-  }
+	function fn(...args: Parameters<T>) {
+		cancelDebounce();
+		id = setTimeout(() => callback(...args), ms);
+	}
 
-  fn.cancelDebounce = cancelDebounce;
+	fn.cancelDebounce = cancelDebounce;
 
-  return fn;
+	return fn;
 }

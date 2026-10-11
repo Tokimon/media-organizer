@@ -1,28 +1,18 @@
 <script lang="ts">
-    import Button from "$lib/components/Button.svelte";
-    import Icon from "$lib/components/Icon.svelte";
-    import fileStore from "$lib/stores/file-store.svelte.js";
-    import { SelectDirectory, SelectFiles } from "$lib/wailsjs/go/api/Api";
-
-    async function selectFiles() {
-        const files = await SelectFiles();
-        fileStore.update(files);
-    }
-
-    async function selectDirectory() {
-        const files = await SelectDirectory();
-        fileStore.update(files);
-    }
+	import Button from '$lib/components/Button.svelte';
+	import Icon from '$lib/components/Icon.svelte';
+	import fileStore from '$lib/stores/file-store.svelte.js';
+	import { SelectDirectory, SelectFiles } from '$lib/wailsjs/go/api/Api';
 </script>
 
 <header>
     {fileStore.files.size} Files
 
-    <Button onclick={selectFiles}>
+    <Button onclick={SelectFiles}>
         <Icon icon="add_image" />
     </Button>
 
-    <Button onclick={selectDirectory}>
+    <Button onclick={SelectDirectory}>
         <Icon icon="add_folder" />
     </Button>
 </header>

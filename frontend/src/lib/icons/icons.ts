@@ -21,7 +21,7 @@ export const iconNames = [
 	'unknown_square',
 	'vector',
 	'vector_2',
-	'volume_up'
+	'volume_up',
 ] as const;
 
-export type IconNames = typeof iconNames[number];
+export type IconNames = (typeof iconNames)[number];
